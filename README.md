@@ -13,3 +13,5 @@ signal_processing_tools:
 
 cordic: cordic algorithm simulation
 1. magnitude and phase calculation
+
+memory_test: a folder related to memory test
