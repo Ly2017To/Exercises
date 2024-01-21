@@ -15,3 +15,5 @@ cordic: cordic algorithm simulation
 1. magnitude and phase calculation
 
 memory_test: a folder related to memory test
+
+fpga_gpio: a folder to show ARM receives GPIO signal from FPGA
