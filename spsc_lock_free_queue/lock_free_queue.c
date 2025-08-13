@@ -3,184 +3,69 @@
 //the consumer thread only modifies the read index
 //reference:https://www.cs.fsu.edu/~baker/realtime/restricted/examples/prodcons/prodcons1.c
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <values.h>
-#include <errno.h>
-#include <sched.h>
+typedef struct {
+	struct MessageInCirBuf * buffer;
+	volatile size_t head;
+	volatile size_t tail;
+	size_t size; //2^n
+	size_t numElements; 
+}CircularBufferLockFree;
 
-typedef struct sharebuff{
-	int size;
-	int numElements;
-	int *b;
-	int in;
-	int out;
-}sharebuff_t;
-
-pthread_t consumer;
-pthread_t producer;
-
-sharebuff_t cirbuff;
-
-sharebuff_t ini_sharebuff(){
-	sharebuff_t cirbuff;
-
-	cirbuff.size=8; //should be a power of 2
-	cirbuff.numElements=cirbuff.size-1;
-	cirbuff.b=(int *)malloc(cirbuff.size*sizeof(int));
-	if(cirbuff.b==NULL){
-		printf("malloc error\n");
-		exit(-1);
+int circularBufInitLockFree(CircularBufferLockFree *cbuf, int size) {
+	int r = -1;
+	cbuf->size = size;
+	cbuf->numElements = size-1;
+	cbuf->buffer = malloc(cbuf->size * sizeof(struct MessageInCirBuf));
+	if(cbuf->buffer == NULL){
+		printf("[Error] CircularBuf - circularBufInit_lockfree - Not enough memory, ptrInfoMsg\n");
+		return r;
 	}
-
-	cirbuff.in=0;
-	cirbuff.out=0;
-
-	return cirbuff;
+    if(circularBufResetLockFree(cbuf) == -1) {
+        r = -1;
+    }
+    else {
+        r = 0;
+    }
+    return r;
 }
 
-void * consumer_body (void *arg) {
-
-	int tmp = 0; //variable to take out from the queue
-
-	printf("consumer thread starts\n");
-
-	for (;;) {
-		printf("consumer: in=%d, out=%d\n", cirbuff.in, cirbuff.out);
-		while (cirbuff.in == cirbuff.out){
-			//printf("here consumer_body\n");
-			//printf("consumer: in=%d\n, out=%d\n", cirbuff.in, cirbuff.out);
-			sched_yield();
-		}
-		tmp = cirbuff.b[cirbuff.out];
-		//cirbuff.out = (cirbuff.out + 1) % cirbuff.size;
-		cirbuff.out = (cirbuff.out + 1) & cirbuff.numElements;
-	}
-	printf("consumer thread exits\n");
-
-	return NULL;
+void circularBufFreeLockFree(CircularBufferLockFree *cbuf) {
+    free(cbuf->buffer);
 }
 
-void * producer_body (void * arg) {
-
-	int val=0; //variable to write into the queue
-
-	printf("producer thread starts\n");
-
-	for (;;){
-
-		//if(((cirbuff.in+1)% cirbuff.size) == cirbuff.out){
-		if(((cirbuff.in+1) & cirbuff.numElements) == cirbuff.out){
-			//printf("here producer_body\n");
-			//printf("producer: in=%d\n, out=%d\n", cirbuff.in, cirbuff.out);
-			sched_yield();
-		}
-
-		printf("producer : in=%d, out=%d\n", cirbuff.in, cirbuff.out);
-		cirbuff.b[cirbuff.in] = val;
-		//cirbuff.in = (cirbuff.in + 1) % cirbuff.size;
-		cirbuff.in = (cirbuff.in + 1) & cirbuff.numElements;
-
-		printf("producer increment index: in=%d, out=%d\n", cirbuff.in, cirbuff.out);
+int circularBufResetLockFree(CircularBufferLockFree *cbuf) {
+	int r = -1;
+	if(cbuf){
+		cbuf->head = 0;
+		cbuf->tail = 0;
+		r = 0;
 	}
-
-	return NULL;
+	return r;
 }
 
-int main () {
-
-	//initialize the circular buffer
-	cirbuff=ini_sharebuff();
-
-	int result;
-	pthread_attr_t attrs;
-
-	void *retval;
-
-	/* use default attributes */
-	pthread_attr_init (&attrs);
-
-	/* create producer thread */
-	if ((result = pthread_create (&producer, &attrs,producer_body,NULL))) {
-		printf ("pthread_create: %d\n", result);
-		exit (-1);
-	}
-	printf("producer thread created\n");
-
-	/* create consumer thread */
-	if ((result = pthread_create (&consumer,&attrs,consumer_body,NULL))) {
-		printf ("pthread_create: %d\n", result);
-		exit (-1);
-	}
-	printf("consumer threads created\n");
-
-	printf("before sleep\n");
-
-	sleep (10);
-
-	printf("after sleep\n");
-
-	//pthread_join(producer,&retval);
-	//pthread_join(consumer,&retval);
-
-	int ret=0;
-
-	ret=pthread_join(producer,&retval);
-
-	if (retval == PTHREAD_CANCELED){
-		printf("The thread was canceled - ");
-	}else{
-		printf("Returned value %d - ", (int)retval);
-	}
-
-	switch (ret) {
-	case 0:
-		printf("The producer thread joined successfully\n");
-		break;
-	case EDEADLK:
-		printf("Deadlock detected\n");
-		break;
-	case EINVAL:
-		printf("The thread is not joinable\n");
-		break;
-	case ESRCH:
-		printf("No thread with given ID is found\n");
-		break;
-	default:
-		printf("Error occurred when joining the thread\n");
-	}
-
-	pthread_join(consumer,&retval);
-
-	if (retval == PTHREAD_CANCELED){
-		printf("The thread was canceled - ");
-	}else{
-		printf("Returned value %d - ", (int)retval);
-	}
-
-	switch (ret) {
-	case 0:
-		printf("The consumer thread joined successfully\n");
-		break;
-	case EDEADLK:
-		printf("Deadlock detected\n");
-		break;
-	case EINVAL:
-		printf("The thread is not joinable\n");
-		break;
-	case ESRCH:
-		printf("No thread with given ID is found\n");
-		break;
-	default:
-		printf("Error occurred when joining the thread\n");
-	}
-
-	pthread_exit(NULL);
-
-	return 0;
+int isCircularBufEmptyLockFree(CircularBufferLockFree cbuf) {
+	return (cbuf.head == cbuf.tail);
 }
 
+int isCircularBufFullLockFree(CircularBufferLockFree cbuf) {
+	return ((cbuf.head + 1) & cbuf.numElements) == cbuf.tail;
+}
 
+int circularBufPutLockFree(CircularBufferLockFree * cbuf, struct MessageInCirBuf mMsg) {
+	if(cbuf && !isCircularBufFullLockFree(*cbuf)) {
+		cbuf->buffer[cbuf->head]  = mMsg;
+		cbuf->head = (cbuf->head + 1) & cbuf->numElements;
+		return 0;
+	}
+	return -1;
+}
+
+int circularBufGetLockFree(CircularBufferLockFree * cbuf, struct MessageInCirBuf * mMsg) {
+	//int r = -1;
+	if(cbuf && mMsg && !isCircularBufEmptyLockFree(*cbuf)) {
+		*mMsg = cbuf->buffer[cbuf->tail];
+		cbuf->tail = (cbuf->tail + 1) & cbuf->numElements;
+		return 0;
+	}
+	return -1;
+}
