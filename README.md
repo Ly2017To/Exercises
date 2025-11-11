@@ -1,10 +1,10 @@
 # Coding Exercises
 
-nn_logicgate: a simple neural network acts as logic gate; written in C;
+nn_logicgate: a simple neural network acts as logic gate; written in C
 
-spsc_lock_free_queue: a single produce single consumer lock free queue;
+spsc_lock_free_queue: a single producer and a single consumer lock free queue
 
-polynomial_regressino: a polynomial regression example to fit curves;
+polynomial_regressino: a polynomial regression example to fit curves
 
 signal_processing_tools: 
 1. generate signals (trigonometric function)
@@ -17,3 +17,5 @@ cordic: cordic algorithm simulation
 memory_test: a folder related to memory test
 
 fpga_gpio: a folder to show ARM receives GPIO signal from FPGA
+
+camera_control: an application to control camera to take photos by commands from messages
