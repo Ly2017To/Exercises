@@ -1,0 +1,27 @@
+{
+  "testLog":false,
+  "port": ,
+  "folderCommon":"../pictures/",
+  "cameras": [
+    {
+      "name": "Camera1",
+      "enable": true,
+      "type": "HikCamera",
+      "ip": "",
+      "port": ,
+      "username": "",
+      "password": "",
+  	  "folder":"../pictures/"
+    },
+    {
+      "name": "Camera2",
+      "enable": true,
+      "type": "HikCamera",
+      "ip": "",
+      "port": ,
+      "username": "",
+      "password": "",
+	  "folder":"../pictures/"
+    }
+  ]
+}
