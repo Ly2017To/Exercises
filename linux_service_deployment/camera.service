@@ -1,0 +1,12 @@
+[Unit]
+Description=Start Camera Control Application
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /path_to/camera.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+
