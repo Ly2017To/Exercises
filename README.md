@@ -19,3 +19,5 @@ memory_test: a folder related to memory test
 fpga_gpio: a folder to show ARM receives GPIO signal from FPGA
 
 camera_control: an application to control camera to take photos by commands from messages
+
+linux_service_deployment: an example of deploying linux system service and user service
