@@ -1,0 +1,33 @@
+{
+  "testLog":true,
+  "port": 8055,
+  "telegraphic": "9874",
+  "aeiStation": 3,
+  "folderCommon":"../pictures/",
+  "cameras": [
+    {
+      "name": "Camera1",
+      "enable": true,
+      "type": "HikCamera",
+      "code": 5,
+      "path": 1,
+      "ip": "192.168.9.14",
+      "port": 156,
+      "username": "",
+      "password": "",
+  	  "folder":"../pictures/"
+    },
+    {
+      "name": "Camera2",
+      "enable": true,
+      "type": "HikCamera",
+      "code": 6,
+      "path": 2,
+      "ip": "192.168.9.201",
+      "port": 8000,
+      "username": "",
+      "password": "",
+	  "folder":"../pictures/"
+    }
+  ]
+}
