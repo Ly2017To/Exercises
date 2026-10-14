@@ -7,17 +7,20 @@
 #include <sstream>
 #include <ctime>
 
+//put 0xXX for each command type to test
 enum CommandType{
-	UPDATE = 0x00,
-	TRIGGERON = 0x01,
-	TRIGGEROFF = 0x02
+	UPDATE = ,
+	TRIGGERON = ,
+	TRIGGEROFF = 
 };
 
-constexpr uint8_t commandType = 0x00;
-constexpr uint8_t commandPath = 0x01;
-constexpr uint8_t commandDir = 0x02;
-constexpr uint8_t commandCarNum = 0x03;
+//put 0xXX for each command type to test
+constexpr uint8_t commandType = ;
+constexpr uint8_t commandPath = ;
+constexpr uint8_t commandDir = ;
+constexpr uint8_t commandCarNum = ;
 
+// put some number to test
 constexpr int maxAxle = 99;
 constexpr int maxTrain = 999;
 constexpr int maxCar = 99;
