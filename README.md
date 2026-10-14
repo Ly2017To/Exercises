@@ -18,6 +18,6 @@ memory_test: a folder related to memory test
 
 fpga_gpio: a folder to show ARM receives GPIO signal from FPGA
 
-camera_control: a middleware to control camera to take photos by commands from messages
+camera_control_events_driven: a middleware to control cameras to take photos by commands from events
 
 linux_service_deployment: an example of deploying linux system service and user service
