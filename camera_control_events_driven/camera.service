@@ -1,0 +1,38 @@
+[Unit]
+Description=Start Camera Control Application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# ============================================================
+# IMPORTANT: Change LOCAL_IP below to match ipLocal in camera_config.json
+# before deploying to a new machine.
+# ============================================================
+# IP needs to be set here, localIP at camera_config file
+Environment="LOCAL_IP= "
+# Step 1: Poll until the configured LOCAL_IP is present on any NIC.
+# Step 2: Wait an additional 10s to ensure routing table and SDK are stable.
+# This solves the cold-boot issue where network-online.target fires
+# before the static IP is fully assigned, causing login error 3.
+ExecStartPre=/bin/bash -c '\
+  echo "Waiting for IP ${LOCAL_IP} to become available..."; \
+  for i in $(seq 1 120); do \
+    if ip addr show 2>/dev/null | grep -q "${LOCAL_IP}/"; then \
+      echo "IP ${LOCAL_IP} detected after ${i}s, waiting 30s for stability..."; \
+      sleep 30; \
+      exit 0; \
+    fi; \
+    sleep 1; \
+  done; \
+  echo "ERROR: IP ${LOCAL_IP} not available after 120s"; \
+  exit 1'
+
+#
+ExecStart=/bin/bash /a_path_to_camera.sh
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+
+[Install]
+WantedBy=multi-user.target
