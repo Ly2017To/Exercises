@@ -1,0 +1,134 @@
+{
+    "_comment": "EXAMPLE CONFIGURATION - every value below is a placeholder and carries no information about any real deployment. IP addresses come from the RFC 5737 documentation ranges (198.51.100.0/24, 203.0.113.0/24), ports are generic, site codes and device names are generic, and all credentials are the literal string 'changeme'. Replace every address, port, name and credential with your own values before deploying.",
+
+    "videooutdirs": "videos",
+    "queryIntervalMs": 5000,
+    "answerTimeoutSec": 10,
+    "maxRecordSeconds": 180,
+    "maxRecordSizeMB": 150,
+    "logLevel": "info",
+    "localIP": "198.51.100.10",
+
+    "AeiInfo": [
+        {
+            "name": "Device-1",
+            "enable": true,
+            "stationid": "ABC",
+            "AEIid": "01",
+            "ip": "198.51.100.11",
+            "port": 9001,
+            "cameras": [
+                {
+                    "name": "Camera11",
+                    "enable": true,
+                    "type": "HikCamera",
+                    "code": 1,
+                    "ip": "203.0.113.11",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                },
+                {
+                    "name": "Camera12",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 2,
+                    "ip": "203.0.113.12",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                }
+            ]
+        },
+        {
+            "name": "Device-2",
+            "enable": true,
+            "stationid": "ABC",
+            "AEIid": "02",
+            "ip": "198.51.100.12",
+            "port": 9002,
+            "cameras": [
+                {
+                    "name": "Camera21",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 3,
+                    "ip": "203.0.113.21",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                },
+                {
+                    "name": "Camera22",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 4,
+                    "ip": "203.0.113.22",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                }
+            ]
+        },
+        {
+            "name": "Device-3",
+            "enable": true,
+            "stationid": "ABC",
+            "AEIid": "03",
+            "ip": "198.51.100.13",
+            "port": 9003,
+            "cameras": [
+                {
+                    "name": "Camera31",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 5,
+                    "ip": "203.0.113.31",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                },
+                {
+                    "name": "Camera32",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 6,
+                    "ip": "203.0.113.32",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                }
+            ]
+        },
+        {
+            "name": "Device-4",
+            "enable": true,
+            "stationid": "ABC",
+            "AEIid": "04",
+            "ip": "198.51.100.14",
+            "port": 9004,
+            "cameras": [
+                {
+                    "name": "Camera41",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 7,
+                    "ip": "203.0.113.41",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                },
+                {
+                    "name": "Camera42",
+                    "enable": false,
+                    "type": "HikCamera",
+                    "code": 8,
+                    "ip": "203.0.113.42",
+                    "port": 8000,
+                    "username": "changeme",
+                    "password": "changeme"
+                }
+            ]
+        }
+    ]
+}

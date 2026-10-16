@@ -1,0 +1,64 @@
+[Unit]
+Description=Camera Control Video Service (event-driven)
+# Wait for the camera-side NIC to be up before starting the service.
+# Required on multi-NIC IPC hosts where the device / camera traffic goes over a
+# dedicated NIC; otherwise the Hikvision SDK may bind to the wrong NIC and
+# start failing logins.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Type=simple: this is a long-running foreground process. systemd will treat
+# it as "active" as soon as execve() returns. This service is designed to be
+# run as a USER unit (default.target below), so it inherits the user's
+# environment and cgroup.
+Type=simple
+
+# Pre-start: wait until the local camera-side NIC has a non-link-local IPv4
+# address, then wait 30s for the link to stabilize before starting the
+# program. This prevents cold-start "SDK error 3" races when the NIC is
+# still negotiating DHCP at boot.
+#
+# Edit the IP below to match the camera-side NIC IP of YOUR host, e.g.
+#   198.51.100.10  (or any address from your own private range).
+# Leave the wait seconds as-is (30s is the empirical stabilization time
+# observed on most managed switches).
+ExecStartPre=/bin/sh -c 'i=0; while [ $i -lt 30 ]; do ip -4 addr show scope global up | grep -q "<YOUR_LOCAL_IP>"; [ $? -eq 0 ] && exit 0; sleep 1; i=$((i+1)); done; echo "[camera_video] local IP not up after 30s, starting anyway" 1>&2'
+ExecStartPre=/bin/sh -c 'echo "[camera_video] pre-start settle 30s (link stable)"; sleep 30'
+
+# Main command. Replace <INSTALL_DIR> with the absolute path where you
+# placed this project, e.g. /opt/camera_video_control.
+#
+# - WorkingDirectory matters: the program resolves the videos/ output root
+#   from the location of the executable, so it does NOT depend on cwd.
+# - The hard-coded log dir is <INSTALL_DIR>/logs (sibling of bin/).
+ExecStart=<INSTALL_DIR>/bin/camera_video_control -c <INSTALL_DIR>/config/aeiconfig.json
+WorkingDirectory=<INSTALL_DIR>
+
+# Environment overrides (optional). Set LOCAL_IP to your camera-side NIC IP
+# to help the Hikvision SDK pick the right NIC; leave empty on single-NIC
+# hosts. The default config field "localIP" is read first; this env var
+# only overrides when set.
+# Environment="LOCAL_IP=<YOUR_LOCAL_IP>"
+
+# Restart policy: always restart on any exit (crash or normal), wait 10s
+# between attempts. StartLimitIntervalSec=0 disables the systemd default
+# 10-starts-in-3-min limit so a flapping binary can keep trying to come
+# back without operator intervention.
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+
+# Nice level: slight de-prioritization so the service does not starve
+# the GUI / other workloads on a desktop host. Remove for a dedicated IPC.
+Nice=-5
+
+[Install]
+# default.target makes this a user-level unit; copy to:
+#   ~/.config/systemd/user/camera_video.service
+# and enable with:
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now camera_video.service
+# For a system-level unit on a headless IPC, change this to
+# multi-user.target and copy to /etc/systemd/system/ instead.
+WantedBy=default.target
